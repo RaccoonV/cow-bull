@@ -1,0 +1,58 @@
+#1A2B猜數字遊戲-A君
+import sys
+import random
+import itertools
+
+#檢查目前所猜的數字，跟篩子裡的數字有沒有存在nAmB的關係
+#ex. 猜0124，系統告知1A1B，則篩子裡的0123不符合1A1B的條件，故False
+#test=0123，source=0124，patt=ABXX 或 AXBX 或 AXXB....
+def matches(test, source, patt):
+    for t, s, p in zip(test, source, patt):
+        #定義A的條件是同位置數字都相等，否則=False
+        if p == 'A' and s != t:
+            return False
+        #定義A的條件是同位置數字不相等，否則=False
+        if p == 'B' and s == t:
+            return False
+        #定義B的條件是其餘的位置找到相同的數字，否則=False
+        if p == 'B' and not s in test:
+            return False
+        if p == 'X' and s in test:
+            return False
+    return True
+
+#產生所有可能的答案，並放進篩子裡，a-d是0-9的數字，不可重複
+digits = "0123456789"
+pool = { a + b + c + d \
+    for a in digits for b in digits for c in digits for d in digits \
+    if len({ a, b, c, d }) == 4 }
+
+for trial in range(11):
+    #顯示目前篩子大小
+    print("pool size is", len(pool), file=sys.stderr)
+    #從篩子裡隨機選一答案後輸出
+    guess = random.sample(pool, 1)[0]
+    print(guess)
+    #從Q讀取input(即nAmB)
+    result = input()
+    A = int(result[0])
+    B = int(result[2])
+    #當4A0B出現，則停止遊戲
+    if A == 4:
+        break
+    #移除掉這一次猜的數字(並非4A0B的數字)
+    pool.remove(guess)
+    #建立一個新的篩子
+    npool = set()
+    #產生nAmB所也可能的組合，且從原來的篩子中篩出可能的答案
+    #ex. 1A2B要篩 ABBX ABXB AXBB...BBXA(所有排列)
+    pattern = "A" * A + "B" * B + "X" * (4 - A - B)
+    for patt in set(itertools.permutations(pattern)):
+        patt = "".join(patt)
+        npool |= { x for x in pool if matches(x, guess, patt) }
+    #把篩子換成新建立的篩子(更新篩子裡的答案)
+    pool = npool
+    #當篩子裡沒有答案，表示出題有問題，故"catch"
+    if len(pool) == 0:
+        print("catch")
+        break
