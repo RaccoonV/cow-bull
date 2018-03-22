@@ -1,0 +1,81 @@
+from string import digits
+from random import randint, choice
+
+#局數
+count = 0
+
+#隨機數字生成
+
+numStr = '0123456789'
+randNum = ''
+for i in range(4) :
+    n = choice(numStr)
+    randNum = randNum + n
+    numStr = numStr.replace(n, '')
+
+#print ('Debug >> randNum',randNum)
+
+
+
+#判斷是否都是數字
+def isallnumber(num):
+    for ch in num :
+        if ch not in digits :
+            return False
+    return True
+
+#判斷是否有相同的字符
+def hasSameDigit(sameNum) :
+    for i in range(len(sameNum)):
+        if (sameNum[0]==sameNum[1]) or (sameNum[0]==sameNum[2]) or (sameNum[0]==sameNum[3]) or (sameNum[1]==sameNum[2]) or (sameNum[1]==sameNum[3]) or (sameNum[2]==sameNum[3]):
+            return True
+    return False
+    
+#之後會使用到的矩陣
+userNums = []    
+results = []
+
+#迴圈開始
+Winner = 0
+while Winner == 0:
+
+    #數字輸入
+    num = []
+    number = 0
+    while (number == 0):
+        num = input('')
+        if (isallnumber(num) == False) :
+            print ('0A0B')
+            exit
+        elif (hasSameDigit(num) == True):
+            print ('0A0B')
+        elif (len(num) != 4) :
+            print ('0A0B')
+            exit
+            
+        else:
+            number +=1
+    userNum = num
+    userNums.append(userNum)
+    #print ('Debug >> userNum',userNum)
+    #判斷誰贏誰輸
+    seatA = 0 
+    seatB = 0
+    count +=1
+    for i in range(4) :
+        if userNum[i] in randNum :
+            if i == randNum.find(userNum[i]) :
+                seatA += 1
+            else :
+                seatB += 1
+        if seatA == 4:
+            print ("4A0B")
+            Winner = 1
+        else:
+            exit
+        result = '%dA%dB' % (seatA, seatB)
+    results.append(result)
+    print (result)
+
+    if Winner == 1 :
+        print ('4A0B')
